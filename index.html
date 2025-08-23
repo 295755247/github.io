@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>零镜 - ZeroJing</title>
+    <meta name="description" content="零镜 - 照见系统，归零重构。不做打工人，从零镜开始。">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 动态背景效果 */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
+            animation: rotate 60s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .container {
+            max-width: 800px;
+            text-align: center;
+            z-index: 1;
+            position: relative;
+        }
+        
+        /* Logo 区域 */
+        .logo {
+            font-size: 80px;
+            font-weight: 100;
+            letter-spacing: 20px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #ffffff 0%, #888888 50%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .subtitle {
+            font-size: 24px;
+            color: #888;
+            margin-bottom: 60px;
+            letter-spacing: 4px;
+        }
+        
+        /* 哲学文字区 */
+        .philosophy {
+            margin: 40px 0;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(10px);
+        }
+        
+        .philosophy p {
+            margin: 20px 0;
+            line-height: 1.8;
+            font-size: 18px;
+            color: #ccc;
+        }
+        
+        .philosophy .highlight {
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        /* 镜像文字效果 */
+        .mirror-text {
+            margin: 40px 0;
+            position: relative;
+            height: 60px;
+        }
+        
+        .mirror-text .original {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        .mirror-text .reflection {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            transform: scaleY(-1);
+            opacity: 0.2;
+            filter: blur(2px);
+        }
+        
+        /* 行动召唤 */
+        .cta {
+            margin-top: 60px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: transparent;
+            color: #fff;
+            text-decoration: none;
+            border: 2px solid #fff;
+            border-radius: 30px;
+            font-size: 18px;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-button:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-2px);
+        }
+        
+        /* 底部 */
+        footer {
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 60px;
+                letter-spacing: 10px;
+            }
+            .subtitle {
+                font-size: 18px;
+            }
+            .philosophy p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo -->
+        <h1 class="logo">零镜</h1>
+        <p class="subtitle">ZEROJING</p>
+        
+        <!-- 镜像文字 -->
+        <div class="mirror-text">
+            <div class="original">照见系统，归零重构</div>
+            <div class="reflection">照见系统，归零重构</div>
+        </div>
+        
+        <!-- 哲学内容 -->
+        <div class="philosophy">
+            <p>过去，你照着公司的镜子，看到一个<span class="highlight">"优秀员工"</span></p>
+            <p>现在，你照着零镜，看到一个<span class="highlight">"被困的灵魂"</span></p>
+            <p>未来，你成为零镜，映照出<span class="highlight">无限可能</span></p>
+            
+            <p style="margin-top: 40px; font-size: 20px; color: #fff;">
+                零镜 - 不是让你看到更好的自己<br>
+                而是让你看到：<span class="highlight">没有系统定义的自己</span>
+            </p>
+        </div>
+        
+        <!-- 行动召唤 -->
+        <div class="cta">
+            <a href="#" class="cta-button">不做打工人，从零镜开始</a>
+        </div>
+        
+        <!-- 底部 -->
+        <footer>
+            <p>© 2024 零镜 ZeroJing. All rights reserved.</p>
+            <p style="margin-top: 10px;">照见系统，归零重构</p>
+        </footer>
+    </div>
+</body>
+</html>
