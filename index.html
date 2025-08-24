@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>零镜</title>
-    <meta name="description" content="零镜 - 照见系统，归零重构。不做打工人，从零镜开始。">
+    <title>零镜 | 照见系统，归零重构</title>
+    <meta name="description" content="零镜 - 不是让你看到更好的自己，而是让你看到：没有系统定义的自己">
     <style>
         * {
             margin: 0;
@@ -14,195 +14,553 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-            color: #ffffff;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* 加载动画 */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s, visibility 1s;
+        }
+        
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader-text {
+            font-size: 24px;
+            letter-spacing: 10px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* 星空背景 */
+        #stars-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        /* 极光效果 */
+        .aurora {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            opacity: 0.3;
+            background: linear-gradient(135deg, 
+                transparent 0%, 
+                rgba(0, 212, 255, 0.1) 20%,
+                transparent 40%,
+                rgba(255, 215, 0, 0.1) 60%,
+                transparent 80%,
+                rgba(0, 212, 255, 0.1) 100%
+            );
+            background-size: 200% 200%;
+            animation: aurora 20s ease infinite;
+        }
+        
+        @keyframes aurora {
+            0%, 100% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+        }
+        
+        /* 主容器 */
+        .container {
+            position: relative;
+            z-index: 10;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
+        }
+        
+        /* Logo区域 */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInUp 1.5s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 零镜主标题 */
+        .main-logo {
+            font-size: 120px;
+            font-weight: 100;
+            letter-spacing: 30px;
+            margin-right: -30px;
+            background: linear-gradient(135deg, #fff 0%, #c0c0c0 50%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            animation: shimmer 3s ease infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+        
+        /* 镜像倒影 */
+        .logo-reflection {
+            font-size: 120px;
+            font-weight: 100;
+            letter-spacing: 30px;
+            margin-right: -30px;
+            margin-top: -60px;
+            opacity: 0.2;
+            transform: scaleY(-1);
+            filter: blur(2px);
+            background: linear-gradient(to bottom, #666, transparent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            letter-spacing: 10px;
+            color: #888;
+            margin-top: 20px;
+            animation: fadeIn 2s ease 0.5s both;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* 哲学卡片区 */
+        .philosophy-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            width: 100%;
+            margin-bottom: 60px;
+            animation: fadeIn 2s ease 1s both;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
         
-        /* 动态背景效果 */
-        body::before {
+        .card::before {
             content: '';
             position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at center, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
-            animation: rotate 60s linear infinite;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(0, 212, 255, 0.1) 0%, 
+                transparent 50%,
+                rgba(255, 215, 0, 0.1) 100%
+            );
+            opacity: 0;
+            transition: opacity 0.5s;
         }
         
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
         }
         
-        .container {
-            max-width: 800px;
-            text-align: center;
-            z-index: 1;
-            position: relative;
+        .card:hover::before {
+            opacity: 1;
         }
         
-        /* Logo 区域 */
-        .logo {
-            font-size: 80px;
-            font-weight: 100;
-            letter-spacing: 20px;
-            margin-bottom: 20px;
-            background: linear-gradient(90deg, #ffffff 0%, #888888 50%, #ffffff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shimmer 3s ease-in-out infinite;
-        }
-        
-        @keyframes shimmer {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        
-        .subtitle {
-            font-size: 24px;
-            color: #888;
-            margin-bottom: 60px;
-            letter-spacing: 4px;
-        }
-        
-        /* 哲学文字区 */
-        .philosophy {
-            margin: 40px 0;
-            padding: 40px;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            background: rgba(255,255,255,0.02);
-            backdrop-filter: blur(10px);
-        }
-        
-        .philosophy p {
-            margin: 20px 0;
-            line-height: 1.8;
+        .card-title {
             font-size: 18px;
-            color: #ccc;
+            color: #00d4ff;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
         }
         
-        .philosophy .highlight {
-            color: #fff;
+        .card-content {
+            color: #ccc;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card-highlight {
+            color: #ffd700;
             font-weight: 500;
         }
         
-        /* 镜像文字效果 */
-        .mirror-text {
-            margin: 40px 0;
-            position: relative;
-            height: 60px;
-        }
-        
-        .mirror-text .original {
-            font-size: 28px;
-            font-weight: 300;
-            letter-spacing: 2px;
-        }
-        
-        .mirror-text .reflection {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            font-size: 28px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            transform: scaleY(-1);
-            opacity: 0.2;
-            filter: blur(2px);
-        }
-        
-        /* 行动召唤 */
-        .cta {
-            margin-top: 60px;
+        /* 行动按钮 */
+        .cta-section {
+            animation: fadeIn 2s ease 1.5s both;
         }
         
         .cta-button {
             display: inline-block;
-            padding: 15px 40px;
-            background: transparent;
-            color: #fff;
-            text-decoration: none;
-            border: 2px solid #fff;
-            border-radius: 30px;
+            padding: 18px 50px;
             font-size: 18px;
-            letter-spacing: 2px;
-            transition: all 0.3s ease;
+            letter-spacing: 3px;
+            color: #000;
+            background: linear-gradient(135deg, #ffd700 0%, #fff 50%, #ffd700 100%);
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
             position: relative;
             overflow: hidden;
+            transition: all 0.5s;
+            font-weight: 500;
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
         
         .cta-button:hover {
-            background: #fff;
-            color: #000;
-            transform: translateY(-2px);
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4);
         }
         
-        /* 底部 */
+        .cta-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* 鼠标光标效果 */
+        .cursor-glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 5;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s;
+        }
+        
+        /* 底部信息 */
         footer {
-            margin-top: 80px;
-            padding-top: 40px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             color: #666;
             font-size: 14px;
+            z-index: 10;
+            animation: fadeIn 2s ease 2s both;
+        }
+        
+        /* 导航菜单 */
+        nav {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 100;
+            animation: fadeIn 2s ease 2s both;
+        }
+        
+        nav a {
+            color: #888;
+            text-decoration: none;
+            margin-left: 30px;
+            transition: color 0.3s;
+            font-size: 16px;
+        }
+        
+        nav a:hover {
+            color: #fff;
         }
         
         /* 响应式 */
         @media (max-width: 768px) {
-            .logo {
+            .main-logo {
                 font-size: 60px;
-                letter-spacing: 10px;
+                letter-spacing: 15px;
+                margin-right: -15px;
             }
+            
+            .logo-reflection {
+                font-size: 60px;
+                letter-spacing: 15px;
+                margin-right: -15px;
+            }
+            
             .subtitle {
-                font-size: 18px;
-            }
-            .philosophy p {
                 font-size: 16px;
+                letter-spacing: 5px;
+            }
+            
+            .philosophy-cards {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+            }
+            
+            nav {
+                top: 20px;
+                right: 20px;
+            }
+            
+            nav a {
+                display: block;
+                margin: 10px 0;
+                text-align: right;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Logo -->
-        <h1 class="logo">零镜</h1>
-        
-        <!-- 镜像文字 -->
-        <div class="mirror-text">
-            <div class="original">照见系统，归零重构</div>
-            <div class="reflection">照见系统，归零重构</div>
-        </div>
-        
-        <!-- 哲学内容 -->
-        <div class="philosophy">
-            <p>过去，你照着公司的镜子，看到一个<span class="highlight">"优秀员工"</span></p>
-            <p>现在，你照着零镜，看到一个<span class="highlight">"被困的灵魂"</span></p>
-            <p>未来，你成为零镜，映照出<span class="highlight">无限可能</span></p>
-            
-            <p style="margin-top: 40px; font-size: 20px; color: #fff;">
-                零镜 - 不是让你看到更好的自己<br>
-                而是让你看到：<span class="highlight">没有系统定义的自己</span>
-            </p>
-        </div>
-        
-        <!-- 行动召唤 -->
-        <div class="cta">
-           <a href="/chapters.html" class="cta-button">不做打工人，从零镜开始</a>
-        </div>
-        
-        <!-- 底部 -->
-        <footer>
-            <p>© 2024 零镜 ZeroJing. All rights reserved.</p>
-            <p style="margin-top: 10px;">照见系统，归零重构</p>
-        </footer>
+    <!-- 加载动画 -->
+    <div class="loader" id="loader">
+        <div class="loader-text">零镜</div>
     </div>
+    
+    <!-- 星空画布 -->
+    <canvas id="stars-canvas"></canvas>
+    
+    <!-- 极光效果 -->
+    <div class="aurora"></div>
+    
+    <!-- 鼠标光晕 -->
+    <div class="cursor-glow" id="cursorGlow"></div>
+    
+    <!-- 导航 -->
+    <nav>
+        <a href="/chapters.html">哲学体系</a>
+        <a href="/about.html">关于</a>
+    </nav>
+    
+    <!-- 主内容 -->
+    <div class="container">
+        <!-- Logo区域 -->
+        <div class="logo-section">
+            <h1 class="main-logo">零镜</h1>
+            <div class="logo-reflection">零镜</div>
+            <p class="subtitle">ZEROJING</p>
+        </div>
+        
+        <!-- 哲学卡片 -->
+        <div class="philosophy-cards">
+            <div class="card">
+                <div class="card-title">过去</div>
+                <div class="card-content">
+                    你照着公司的镜子，看到一个<span class="card-highlight">"优秀员工"</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">现在</div>
+                <div class="card-content">
+                    你照着零镜，看到一个<span class="card-highlight">"被困的灵魂"</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">未来</div>
+                <div class="card-content">
+                    你成为零镜，映照出<span class="card-highlight">无限可能</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 行动按钮 -->
+        <div class="cta-section">
+            <a href="/chapters.html" class="cta-button">
+                不做打工人，从零镜开始
+            </a>
+        </div>
+    </div>
+    
+    <!-- 底部信息 -->
+    <footer>
+        © 2025 零镜 . All rights reserved.
+    </footer>
+    
+    <script>
+        // 加载动画
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1500);
+        });
+        
+        // 星空效果
+        const canvas = document.getElementById('stars-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // 星星类
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.brightness = Math.random();
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+                
+                this.brightness += (Math.random() - 0.5) * 0.1;
+                if (this.brightness < 0.3) this.brightness = 0.3;
+                if (this.brightness > 1) this.brightness = 1;
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.brightness})`;
+                ctx.fill();
+            }
+        }
+        
+        // 创建星星
+        const stars = [];
+        for (let i = 0; i < 200; i++) {
+            stars.push(new Star());
+        }
+        
+        // 动画循环
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        // 窗口调整
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // 鼠标光晕效果
+        const cursorGlow = document.getElementById('cursorGlow');
+        let mouseX = 0;
+        let mouseY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        
+        function updateCursor() {
+            currentX += (mouseX - currentX) * 0.1;
+            currentY += (mouseY - currentY) * 0.1;
+            
+            cursorGlow.style.left = currentX + 'px';
+            cursorGlow.style.top = currentY + 'px';
+            
+            requestAnimationFrame(updateCursor);
+        }
+        
+        updateCursor();
+        
+        // 卡片视差效果
+        const cards = document.querySelectorAll('.card');
+        
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+            });
+        });
+        
+        // 打字效果（可选）
+        const subtitle = document.querySelector('.subtitle');
+        const text = subtitle.textContent;
+        subtitle.textContent = '';
+        let index = 0;
+        
+        function typeWriter() {
+            if (index < text.length) {
+                subtitle.textContent += text.charAt(index);
+                index++;
+                setTimeout(typeWriter, 100);
+            }
+        }
+        
+        setTimeout(typeWriter, 2000);
+    </script>
 </body>
 </html>
