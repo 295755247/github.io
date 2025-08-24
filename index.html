@@ -1,566 +1,222 @@
-<!DOCTYPE html>
-<html lang="zh">
+<!doctype html>
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>零镜 | 照见系统，归零重构</title>
-    <meta name="description" content="零镜 - 不是让你看到更好的自己，而是让你看到：没有系统定义的自己">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
-            background: #000;
-            color: #fff;
-            overflow-x: hidden;
-            position: relative;
-        }
-        
-        /* 加载动画 */
-        .loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 1s, visibility 1s;
-        }
-        
-        .loader.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-        
-        .loader-text {
-            font-size: 24px;
-            letter-spacing: 10px;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-        
-        /* 星空背景 */
-        #stars-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        
-        /* 极光效果 */
-        .aurora {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            opacity: 0.3;
-            background: linear-gradient(135deg, 
-                transparent 0%, 
-                rgba(0, 212, 255, 0.1) 20%,
-                transparent 40%,
-                rgba(255, 215, 0, 0.1) 60%,
-                transparent 80%,
-                rgba(0, 212, 255, 0.1) 100%
-            );
-            background-size: 200% 200%;
-            animation: aurora 20s ease infinite;
-        }
-        
-        @keyframes aurora {
-            0%, 100% { background-position: 0% 0%; }
-            50% { background-position: 100% 100%; }
-        }
-        
-        /* 主容器 */
-        .container {
-            position: relative;
-            z-index: 10;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        /* Logo区域 */
-        .logo-section {
-            text-align: center;
-            margin-bottom: 60px;
-            animation: fadeInUp 1.5s ease;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* 零镜主标题 */
-        .main-logo {
-            font-size: 120px;
-            font-weight: 100;
-            letter-spacing: 30px;
-            margin-right: -30px;
-            background: linear-gradient(135deg, #fff 0%, #c0c0c0 50%, #fff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            position: relative;
-            animation: shimmer 3s ease infinite;
-        }
-        
-        @keyframes shimmer {
-            0%, 100% { filter: brightness(1); }
-            50% { filter: brightness(1.2); }
-        }
-        
-        /* 镜像倒影 */
-        .logo-reflection {
-            font-size: 120px;
-            font-weight: 100;
-            letter-spacing: 30px;
-            margin-right: -30px;
-            margin-top: -60px;
-            opacity: 0.2;
-            transform: scaleY(-1);
-            filter: blur(2px);
-            background: linear-gradient(to bottom, #666, transparent);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .subtitle {
-            font-size: 20px;
-            letter-spacing: 10px;
-            color: #888;
-            margin-top: 20px;
-            animation: fadeIn 2s ease 0.5s both;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        /* 哲学卡片区 */
-        .philosophy-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            max-width: 1000px;
-            width: 100%;
-            margin-bottom: 60px;
-            animation: fadeIn 2s ease 1s both;
-        }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, 
-                rgba(0, 212, 255, 0.1) 0%, 
-                transparent 50%,
-                rgba(255, 215, 0, 0.1) 100%
-            );
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-        
-        .card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .card:hover::before {
-            opacity: 1;
-        }
-        
-        .card-title {
-            font-size: 18px;
-            color: #00d4ff;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .card-content {
-            color: #ccc;
-            line-height: 1.8;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .card-highlight {
-            color: #ffd700;
-            font-weight: 500;
-        }
-        
-        /* 行动按钮 */
-        .cta-section {
-            animation: fadeIn 2s ease 1.5s both;
-        }
-        
-        .cta-button {
-            display: inline-block;
-            padding: 18px 50px;
-            font-size: 18px;
-            letter-spacing: 3px;
-            color: #000;
-            background: linear-gradient(135deg, #ffd700 0%, #fff 50%, #ffd700 100%);
-            border: none;
-            border-radius: 50px;
-            text-decoration: none;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.5s;
-            font-weight: 500;
-        }
-        
-        .cta-button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        
-        .cta-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4);
-        }
-        
-        .cta-button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-        
-        /* 鼠标光标效果 */
-        .cursor-glow {
-            position: fixed;
-            width: 400px;
-            height: 400px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 5;
-            transform: translate(-50%, -50%);
-            transition: opacity 0.3s;
-        }
-        
-        /* 底部信息 */
-        footer {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #666;
-            font-size: 14px;
-            z-index: 10;
-            animation: fadeIn 2s ease 2s both;
-        }
-        
-        /* 导航菜单 */
-        nav {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            z-index: 100;
-            animation: fadeIn 2s ease 2s both;
-        }
-        
-        nav a {
-            color: #888;
-            text-decoration: none;
-            margin-left: 30px;
-            transition: color 0.3s;
-            font-size: 16px;
-        }
-        
-        nav a:hover {
-            color: #fff;
-        }
-        
-        /* 响应式 */
-        @media (max-width: 768px) {
-            .main-logo {
-                font-size: 60px;
-                letter-spacing: 15px;
-                margin-right: -15px;
-            }
-            
-            .logo-reflection {
-                font-size: 60px;
-                letter-spacing: 15px;
-                margin-right: -15px;
-            }
-            
-            .subtitle {
-                font-size: 16px;
-                letter-spacing: 5px;
-            }
-            
-            .philosophy-cards {
-                grid-template-columns: 1fr;
-                padding: 0 20px;
-            }
-            
-            nav {
-                top: 20px;
-                right: 20px;
-            }
-            
-            nav a {
-                display: block;
-                margin: 10px 0;
-                text-align: right;
-            }
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>零镜</title>
+<meta name="description" content="零镜：照见系统之前的你。" />
+<style>
+  /* ====== 主题变量（可按需修改） ====== */
+  :root{
+    --bg:#000000;           /* 纯黑（系统） */
+    --mist:#1a1a1a;         /* 迷雾 */
+    --fg:#e0e0e0;           /* 冷白（真相） */
+    --muted:#9aa0a6;
+    --gold:#806020;         /* 暗金（觉醒微光） */
+    --gold-alpha:0.16;      /* 微光强度：0.10=内敛（你的当前选择），0.16=更可见 */
+    --radius:26px;
+    --crack-open:0;         /* JS 动态：裂纹开合 0–1 */
+  }
+
+  /* ====== 基础 ====== */
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.75 system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",Segoe UI,Arial,sans-serif;}
+  a{color:inherit;text-decoration:none}
+  .wrap{display:flex;flex-direction:column;min-height:100vh}
+  /* 极暗雾+噪点（不温暖、不花哨） */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:-2;
+    background:
+      radial-gradient(1200px 600px at 70% -10%, rgba(26,26,26,.5), transparent 60%),
+      radial-gradient(900px 500px at -10% 80%, rgba(26,26,26,.45), transparent 65%),
+      linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2P8/5/hPwMIAwI0m1mJqQAAAABJRU5ErkJggg=='); /* 极细噪点 */
+    opacity:.35;mix-blend-mode:normal;
+  }
+
+  /* ====== 顶部极简导航（只保留必要入口） ====== */
+  .nav{display:flex;justify-content:space-between;align-items:center;padding:18px 24px}
+  .brand{letter-spacing:.4em;font-weight:700;opacity:.65}
+  .nav a{opacity:.7}
+  .nav a:hover{opacity:1}
+
+  /* ====== 首屏舞台 ====== */
+  .stage{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px}
+  .hero{position:relative;max-width:1024px;width:100%;display:grid;place-items:center;text-align:center}
+
+  /* ====== 黑镜主体 ====== */
+  .mirror{
+    position:relative;width:min(88vw,860px);aspect-ratio:16/9;border-radius:var(--radius);
+    background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02) 60%, rgba(255,255,255,.01));
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.06),
+      inset 0 -80px 120px rgba(0,0,0,.85);
+    overflow:hidden;isolation:isolate;cursor:crosshair;
+  }
+  /* 人形剪影（匿名、模糊） */
+  .mirror::before{
+    content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+    background:
+      radial-gradient(60px 90px at 50% 38%, rgba(255,255,255,.14), transparent 70%), /* 头部淡光 */
+      radial-gradient(160px 260px at 50% 60%, rgba(255,255,255,.10), transparent 72%); /* 上身淡光 */
+    filter:blur(18px) contrast(110%); opacity:.5;
+  }
+  /* 暗金微光仅从裂缝处溢出（用伪元素盖在最下层） */
+  .mirror .glow{
+    position:absolute;inset:-30%;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(closest-side, rgba(128,96,32,var(--gold-alpha)), rgba(128,96,32,0) 60%);
+    transform:scale(calc(1 + .12 * var(--crack-open)));
+    transition:transform .25s ease, opacity .25s ease; opacity:.9;
+  }
+
+  /* 标题与副句（极简冷峻） */
+  .title{position:absolute;inset:0;display:grid;place-content:center;z-index:2;pointer-events:none}
+  .h1{
+    font-weight:800;letter-spacing:.12em;font-size:56px;line-height:1.05;margin:0 0 8px;
+    text-shadow:0 0 14px rgba(255,255,255,.05);
+  }
+  .sub{margin:0;opacity:.72}
+
+  /* 幽灵 CTA（一个即可） */
+  .cta{
+    position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:3;
+    display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.18); color:var(--fg); background:rgba(255,255,255,.02);
+    box-shadow:0 0 0 0 rgba(128,96,32,0); transition:box-shadow .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .cta:hover{border-color:rgba(255,255,255,.28); background:rgba(255,255,255,.04);
+    box-shadow:0 0 24px 0 rgba(128,96,32,var(--gold-alpha));}
+
+  /* 裂纹（SVG 线条，受 --crack-open 控制） */
+  .cracks{position:absolute;inset:0;z-index:2;mix-blend-mode:screen;opacity:.9}
+  .cracks path{
+    stroke: rgba(230,231,235, calc(.25 + .55*var(--crack-open)));
+    stroke-width:1; stroke-linecap:round; fill:none;
+    filter: drop-shadow(0 0 8px rgba(128,96,32, calc(var(--gold-alpha) * ( .6 + .8*var(--crack-open) ))));
+    transform: scale(calc(1 + .02 * var(--crack-open)));
+    transform-origin: 50% 40%;
+    transition: transform .15s linear;
+  }
+
+  /* 点击碎裂 → 黑场 → 重组 → 路径层 */
+  .mirror.shatter .cracks path{stroke-width:1.6}
+  .blackout{position:absolute;inset:0;background:#000;opacity:0;z-index:4;pointer-events:none;transition:opacity .6s ease}
+  .mirror.shatter .blackout{opacity:.9}
+  .overlay{
+    position:absolute;inset:0;display:grid;place-content:center;z-index:5;opacity:0;pointer-events:none;
+    transition:opacity .4s ease .6s;
+    background:radial-gradient(closest-side, rgba(0,0,0,.25), rgba(0,0,0,.6) 70%);
+  }
+  .mirror.reform .overlay{opacity:1;pointer-events:auto}
+  .overlay a{display:block;text-align:center;margin:8px 0;padding:10px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.18);opacity:.9}
+  .overlay a:hover{opacity:1;border-color:rgba(255,255,255,.3)}
+  /* 自适应 */
+  @media (max-width:720px){ .h1{font-size:42px} .sub{font-size:14px} .mirror{border-radius:18px} }
+</style>
 </head>
 <body>
-    <!-- 加载动画 -->
-    <div class="loader" id="loader">
-        <div class="loader-text">零镜</div>
+<div class="wrap">
+
+  <nav class="nav" aria-label="主导航">
+    <div class="brand">零镜</div>
+    <div style="display:flex;gap:18px">
+      <a href="#video" aria-label="短视频">视频</a>
+      <a href="#manifesto" aria-label="宣言">宣言</a>
+      <a href="#join" aria-label="加入">加入</a>
     </div>
-    
-    <!-- 星空画布 -->
-    <canvas id="stars-canvas"></canvas>
-    
-    <!-- 极光效果 -->
-    <div class="aurora"></div>
-    
-    <!-- 鼠标光晕 -->
-    <div class="cursor-glow" id="cursorGlow"></div>
-    
-    <!-- 导航 -->
-    <nav>
-        <a href="/chapters.html">哲学体系</a>
-        <a href="/about.html">关于</a>
-    </nav>
-    
-    <!-- 主内容 -->
-    <div class="container">
-        <!-- Logo区域 -->
-        <div class="logo-section">
-            <h1 class="main-logo">零镜</h1>
-            <div class="logo-reflection">零镜</div>
-            <p class="subtitle">ZEROJING</p>
+  </nav>
+
+  <main class="stage">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="mirror" id="mirror" aria-hidden="true">
+        <div class="glow"></div>
+
+        <!-- 标题与副句（只有一句话） -->
+        <div class="title">
+          <h1 id="hero-title" class="h1">零镜</h1>
+          <p class="sub">照见系统之前的你</p>
         </div>
-        
-        <!-- 哲学卡片 -->
-        <div class="philosophy-cards">
-            <div class="card">
-                <div class="card-title">过去</div>
-                <div class="card-content">
-                    你照着公司的镜子，看到一个<span class="card-highlight">"优秀员工"</span>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">现在</div>
-                <div class="card-content">
-                    你照着零镜，看到一个<span class="card-highlight">"被困的灵魂"</span>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">未来</div>
-                <div class="card-content">
-                    你成为零镜，映照出<span class="card-highlight">无限可能</span>
-                </div>
-            </div>
+
+        <!-- 幽灵 CTA（想改为“开始观察”，改下面按钮文本即可） -->
+        <a class="cta" id="cta" href="#start">开始观察</a> <!-- ← 改成“开始观察” -->
+
+        <!-- 裂纹（抽象放射状） -->
+        <svg class="cracks" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M50,38 L50,7" />
+          <path d="M50,38 L73,12" />
+          <path d="M50,38 L89,26" />
+          <path d="M50,38 L94,52" />
+          <path d="M50,38 L86,78" />
+          <path d="M50,38 L62,94" />
+          <path d="M50,38 L38,94" />
+          <path d="M50,38 L14,82" />
+          <path d="M50,38 L6,54" />
+          <path d="M50,38 L8,26" />
+          <path d="M50,38 L28,10" />
+        </svg>
+
+        <!-- 碎裂/重组遮罩与两条路径 -->
+        <div class="blackout"></div>
+        <div class="overlay" id="overlay" aria-hidden="true">
+          <a href="#video">看 60 秒</a>
+          <a href="#manifesto">读宣言</a>
         </div>
-        
-        <!-- 行动按钮 -->
-        <div class="cta-section">
-            <a href="/chapters.html" class="cta-button">
-                不做打工人，从零镜开始
-            </a>
-        </div>
-    </div>
-    
-    <!-- 底部信息 -->
-    <footer>
-        © 2025 零镜 . All rights reserved.
-    </footer>
-    
-    <script>
-        // 加载动画
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loader').classList.add('hidden');
-            }, 1500);
-        });
-        
-        // 星空效果
-        const canvas = document.getElementById('stars-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        
-        // 星星类
-        class Star {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2;
-                this.speedX = (Math.random() - 0.5) * 0.3;
-                this.speedY = (Math.random() - 0.5) * 0.3;
-                this.brightness = Math.random();
-            }
-            
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                
-                if (this.x < 0) this.x = canvas.width;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.y > canvas.height) this.y = 0;
-                
-                this.brightness += (Math.random() - 0.5) * 0.1;
-                if (this.brightness < 0.3) this.brightness = 0.3;
-                if (this.brightness > 1) this.brightness = 1;
-            }
-            
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.brightness})`;
-                ctx.fill();
-            }
-        }
-        
-        // 创建星星
-        const stars = [];
-        for (let i = 0; i < 200; i++) {
-            stars.push(new Star());
-        }
-        
-        // 动画循环
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            stars.forEach(star => {
-                star.update();
-                star.draw();
-            });
-            
-            requestAnimationFrame(animate);
-        }
-        
-        animate();
-        
-        // 窗口调整
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-        
-        // 鼠标光晕效果
-        const cursorGlow = document.getElementById('cursorGlow');
-        let mouseX = 0;
-        let mouseY = 0;
-        let currentX = 0;
-        let currentY = 0;
-        
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        });
-        
-        function updateCursor() {
-            currentX += (mouseX - currentX) * 0.1;
-            currentY += (mouseY - currentY) * 0.1;
-            
-            cursorGlow.style.left = currentX + 'px';
-            cursorGlow.style.top = currentY + 'px';
-            
-            requestAnimationFrame(updateCursor);
-        }
-        
-        updateCursor();
-        
-        // 卡片视差效果
-        const cards = document.querySelectorAll('.card');
-        
-        cards.forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                const rotateX = (y - centerY) / 10;
-                const rotateY = (centerX - x) / 10;
-                
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
-            });
-        });
-        
-        // 打字效果（可选）
-        const subtitle = document.querySelector('.subtitle');
-        const text = subtitle.textContent;
-        subtitle.textContent = '';
-        let index = 0;
-        
-        function typeWriter() {
-            if (index < text.length) {
-                subtitle.textContent += text.charAt(index);
-                index++;
-                setTimeout(typeWriter, 100);
-            }
-        }
-        
-        setTimeout(typeWriter, 2000);
-    </script>
+      </div>
+    </section>
+  </main>
+
+  <footer style="text-align:center;color:var(--muted);padding:28px 16px">
+    © 2025 零镜 · 系统对抗系统
+  </footer>
+</div>
+
+<script>
+(function(){
+  const root = document.documentElement;
+  const mirror = document.getElementById('mirror');
+  const overlay = document.getElementById('overlay');
+
+  // 鼠标靠近中心 → 裂纹开合、微光增强
+  mirror.addEventListener('mousemove', (e)=>{
+    const rect = mirror.getBoundingClientRect();
+    const cx = rect.left + rect.width*0.5;
+    const cy = rect.top + rect.height*0.40; // 裂纹原点略偏上
+    const dx = (e.clientX - cx);
+    const dy = (e.clientY - cy);
+    const dist = Math.hypot(dx, dy);
+    const max = Math.hypot(rect.width/2, rect.height/2);
+    const openness = Math.max(0, Math.min(1, 1 - dist/max)); // 越靠近越开
+    root.style.setProperty('--crack-open', (openness*1).toFixed(3));
+  });
+
+  mirror.addEventListener('mouseleave', ()=>{
+    root.style.setProperty('--crack-open', 0);
+  });
+
+  // 点击镜面：碎裂→黑→重组→出现两条路径
+  let busy = false;
+  mirror.addEventListener('click', ()=>{
+    if(busy) return;
+    busy = true;
+    mirror.classList.add('shatter');
+    setTimeout(()=>{ // 黑场
+      mirror.classList.add('reform');
+      overlay.setAttribute('aria-hidden','false');
+      setTimeout(()=>{
+        mirror.classList.remove('shatter'); // 重置为“重组完成”的状态
+        busy = false;
+      }, 900);
+    }, 600);
+  });
+
+  // 想把暗金微光改为“更可见（+16%）”：把下一行的 0.10 改成 0.16 或直接改 CSS 变量
+  // document.documentElement.style.setProperty('--gold-alpha','0.16');
+})();
+</script>
 </body>
 </html>
