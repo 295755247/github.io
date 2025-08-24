@@ -1,222 +1,264 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>零镜</title>
-<meta name="description" content="零镜：照见系统之前的你。" />
+<meta name="description" content="零镜：在系统与个体之间，照见被定义之前的你。" />
 <style>
-  /* ====== 主题变量（可按需修改） ====== */
   :root{
-    --bg:#000000;           /* 纯黑（系统） */
-    --mist:#1a1a1a;         /* 迷雾 */
-    --fg:#e0e0e0;           /* 冷白（真相） */
-    --muted:#9aa0a6;
-    --gold:#806020;         /* 暗金（觉醒微光） */
-    --gold-alpha:0.16;      /* 微光强度：0.10=内敛（你的当前选择），0.16=更可见 */
-    --radius:26px;
-    --crack-open:0;         /* JS 动态：裂纹开合 0–1 */
+    --bg:#000; --mist:#1a1a1a; --fg:#e0e0e0; --muted:#9aa0a6;
+    --gold:#806020; --gold-alpha:0.16;  /* 暗金微光强度：0.12 内敛；需要更明显改 0.16 */
+    --radius:26px; --open:0;             /* 裂纹开合 0–1（JS 控制） */
   }
-
-  /* ====== 基础 ====== */
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);
     font:16px/1.75 system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",Segoe UI,Arial,sans-serif;}
-  a{color:inherit;text-decoration:none}
-  .wrap{display:flex;flex-direction:column;min-height:100vh}
-  /* 极暗雾+噪点（不温暖、不花哨） */
-  body::before{
-    content:"";position:fixed;inset:0;pointer-events:none;z-index:-2;
-    background:
-      radial-gradient(1200px 600px at 70% -10%, rgba(26,26,26,.5), transparent 60%),
-      radial-gradient(900px 500px at -10% 80%, rgba(26,26,26,.45), transparent 65%),
-      linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
-  }
-  body::after{
-    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2P8/5/hPwMIAwI0m1mJqQAAAABJRU5ErkJggg=='); /* 极细噪点 */
-    opacity:.35;mix-blend-mode:normal;
-  }
 
-  /* ====== 顶部极简导航（只保留必要入口） ====== */
-  .nav{display:flex;justify-content:space-between;align-items:center;padding:18px 24px}
-  .brand{letter-spacing:.4em;font-weight:700;opacity:.65}
-  .nav a{opacity:.7}
-  .nav a:hover{opacity:1}
+  /* ============ 加载动画（黑场 + 呼吸字样） ============ */
+  .loader{position:fixed;inset:0;background:#000;z-index:9999;display:grid;place-items:center;
+    transition:opacity .8s ease, visibility .8s ease;}
+  .loader.hidden{opacity:0;visibility:hidden}
+  .loader h1{letter-spacing:.24em;font-weight:700;opacity:.85;animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
 
-  /* ====== 首屏舞台 ====== */
-  .stage{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px}
-  .hero{position:relative;max-width:1024px;width:100%;display:grid;place-items:center;text-align:center}
+  /* ============ 星空（200颗，低亮度） ============ */
+  #stars{position:fixed;inset:0;z-index:1}
 
-  /* ====== 黑镜主体 ====== */
-  .mirror{
-    position:relative;width:min(88vw,860px);aspect-ratio:16/9;border-radius:var(--radius);
-    background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02) 60%, rgba(255,255,255,.01));
-    box-shadow:
-      inset 0 0 0 1px rgba(255,255,255,.06),
-      inset 0 -80px 120px rgba(0,0,0,.85);
-    overflow:hidden;isolation:isolate;cursor:crosshair;
-  }
-  /* 人形剪影（匿名、模糊） */
-  .mirror::before{
-    content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
-    background:
-      radial-gradient(60px 90px at 50% 38%, rgba(255,255,255,.14), transparent 70%), /* 头部淡光 */
-      radial-gradient(160px 260px at 50% 60%, rgba(255,255,255,.10), transparent 72%); /* 上身淡光 */
-    filter:blur(18px) contrast(110%); opacity:.5;
-  }
-  /* 暗金微光仅从裂缝处溢出（用伪元素盖在最下层） */
-  .mirror .glow{
-    position:absolute;inset:-30%;z-index:0;pointer-events:none;
-    background:
-      radial-gradient(closest-side, rgba(128,96,32,var(--gold-alpha)), rgba(128,96,32,0) 60%);
-    transform:scale(calc(1 + .12 * var(--crack-open)));
-    transition:transform .25s ease, opacity .25s ease; opacity:.9;
-  }
+  /* ============ 极光渐变（极淡） ============ */
+  .aurora{position:fixed;inset:0;z-index:2;opacity:.22;
+    background: linear-gradient(135deg, transparent 0%,
+      rgba(34,211,238,.12) 20%, transparent 45%, rgba(244,114,182,.10) 65%, transparent 85%);
+    background-size:200% 200%; animation:aurora 26s ease-in-out infinite;}
+  @keyframes aurora{0%,100%{background-position:0% 0%}50%{background-position:100% 100%}}
 
-  /* 标题与副句（极简冷峻） */
-  .title{position:absolute;inset:0;display:grid;place-content:center;z-index:2;pointer-events:none}
-  .h1{
-    font-weight:800;letter-spacing:.12em;font-size:56px;line-height:1.05;margin:0 0 8px;
-    text-shadow:0 0 14px rgba(255,255,255,.05);
-  }
-  .sub{margin:0;opacity:.72}
+  /* ============ 鼠标跟随光晕（低强度） ============ */
+  .cursor{position:fixed;width:360px;height:360px;left:-9999px;top:-9999px;border-radius:50%;
+    background:radial-gradient(circle, rgba(34,211,238,.10) 0%, transparent 70%);
+    pointer-events:none;z-index:5;mix-blend-mode:screen;transition:opacity .2s ease}
 
-  /* 幽灵 CTA（一个即可） */
-  .cta{
-    position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:3;
-    display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;
-    border:1px solid rgba(255,255,255,.18); color:var(--fg); background:rgba(255,255,255,.02);
-    box-shadow:0 0 0 0 rgba(128,96,32,0); transition:box-shadow .2s ease, border-color .2s ease, background .2s ease;
-  }
-  .cta:hover{border-color:rgba(255,255,255,.28); background:rgba(255,255,255,.04);
-    box-shadow:0 0 24px 0 rgba(128,96,32,var(--gold-alpha));}
+  /* ============ 顶部极简导航（可留可去） ============ */
+  nav{position:fixed;top:24px;right:24px;z-index:10}
+  nav a{color:#a3a3a3;margin-left:24px;text-decoration:none}
+  nav a:hover{color:#fff}
 
-  /* 裂纹（SVG 线条，受 --crack-open 控制） */
-  .cracks{position:absolute;inset:0;z-index:2;mix-blend-mode:screen;opacity:.9}
+  /* ============ 首屏舞台 ============ */
+  .wrap{position:relative;z-index:3;min-height:100svh;display:grid;place-items:center;padding:40px 24px}
+
+  /* 黑镜主体（16:9）、轻雾、微高光 */
+  .mirror{position:relative;width:min(88vw,860px);aspect-ratio:16/9;border-radius:var(--radius);
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02) 60%, rgba(255,255,255,.01));
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), inset 0 -80px 120px rgba(0,0,0,.85);
+    overflow:hidden;isolation:isolate;cursor:crosshair;}
+  .mirror::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+    background: radial-gradient(130% 80% at 70% -10%, rgba(26,26,26,.55), transparent 60%),
+                radial-gradient(110% 70% at -10% 90%, rgba(26,26,26,.45), transparent 70%);}
+
+  /* 模糊人形剪影（匿名） */
+  .silhouette{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.55;
+    background: radial-gradient(60px 90px at 50% 38%, rgba(255,255,255,.14), transparent 70%),
+                radial-gradient(160px 260px at 50% 60%, rgba(255,255,255,.10), transparent 72%);
+    filter:blur(18px) contrast(110%);}
+
+  /* 暗金微光（随裂纹开合轻度放大） */
+  .glow{position:absolute;inset:-30%;z-index:0;pointer-events:none;opacity:.9;
+    background: radial-gradient(closest-side, rgba(128,96,32,var(--gold-alpha)), rgba(128,96,32,0) 60%);
+    transform:scale(calc(1 + .12 * var(--open))); transition:transform .25s ease, opacity .25s ease;}
+
+  /* 文案与镜像倒影 */
+  .title{position:absolute;inset:0;display:grid;place-content:center;text-align:center;z-index:2;pointer-events:none}
+  .h1{margin:0 0 8px;font-weight:700;letter-spacing:.12em;line-height:1.05;font-size:56px;text-shadow:0 0 14px rgba(255,255,255,.05)}
+  .h1-reflect{transform:scaleY(-1);opacity:.18;filter:blur(2px);
+    background:linear-gradient(to bottom, #999 0%, transparent 65%); -webkit-background-clip:text; -webkit-text-fill-color:transparent}
+  .sub{margin:10px 0 0;opacity:.0}   /* 初始隐藏，打字机显示 */
+
+  /* CTA 液态按钮（涟漪） */
+  .cta{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:3;
+    display:inline-flex;align-items:center;padding:12px 22px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.02);color:var(--fg);
+    text-decoration:none;letter-spacing:.2em;overflow:hidden;transition:background .2s ease,border-color .2s ease,box-shadow .2s ease}
+  .cta:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.28);
+    box-shadow:0 0 24px 0 rgba(128,96,32,var(--gold-alpha))}
+  .ripple{position:absolute;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;
+    background:rgba(255,255,255,.25);width:0;height:0;opacity:.6;animation:rip .8s ease-out forwards}
+  @keyframes rip{to{width:360px;height:360px;opacity:0}}
+
+  /* 放射裂纹（SVG 线，受 --open 影响） */
+  .cracks{position:absolute;inset:0;z-index:2;mix-blend-mode:screen}
   .cracks path{
-    stroke: rgba(230,231,235, calc(.25 + .55*var(--crack-open)));
-    stroke-width:1; stroke-linecap:round; fill:none;
-    filter: drop-shadow(0 0 8px rgba(128,96,32, calc(var(--gold-alpha) * ( .6 + .8*var(--crack-open) ))));
-    transform: scale(calc(1 + .02 * var(--crack-open)));
-    transform-origin: 50% 40%;
+    stroke: rgba(230,231,235, calc(.22 + .6*var(--open)));
+    stroke-width:1;stroke-linecap:round;fill:none;
+    filter: drop-shadow(0 0 8px rgba(128,96,32, calc(var(--gold-alpha) * (.6 + .8*var(--open)))));
+    transform: scale(calc(1 + .02*var(--open))); transform-origin:50% 40%;
     transition: transform .15s linear;
   }
 
-  /* 点击碎裂 → 黑场 → 重组 → 路径层 */
-  .mirror.shatter .cracks path{stroke-width:1.6}
-  .blackout{position:absolute;inset:0;background:#000;opacity:0;z-index:4;pointer-events:none;transition:opacity .6s ease}
-  .mirror.shatter .blackout{opacity:.9}
-  .overlay{
-    position:absolute;inset:0;display:grid;place-content:center;z-index:5;opacity:0;pointer-events:none;
-    transition:opacity .4s ease .6s;
-    background:radial-gradient(closest-side, rgba(0,0,0,.25), rgba(0,0,0,.6) 70%);
-  }
-  .mirror.reform .overlay{opacity:1;pointer-events:auto}
-  .overlay a{display:block;text-align:center;margin:8px 0;padding:10px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.18);opacity:.9}
-  .overlay a:hover{opacity:1;border-color:rgba(255,255,255,.3)}
-  /* 自适应 */
-  @media (max-width:720px){ .h1{font-size:42px} .sub{font-size:14px} .mirror{border-radius:18px} }
+  /* ============ 二屏：3D 视差玻璃卡（低调） ============ */
+  .grid{max-width:1100px;margin:72px auto 56px;padding:0 24px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+  .card{background:rgba(255,255,255,.03);backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:18px;transition:transform .25s ease,border-color .25s ease}
+  .card:hover{transform:translateY(-4px) scale(1.02);border-color:rgba(255,255,255,.22)}
+  .tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:rgba(34,211,238,.12);color:#93e5f9;margin-bottom:8px}
+  .card h3{margin:6px 0 8px;font-size:18px}
+  .muted{color:#b7b7b7}
+
+  /* ============ 底部 ============ */
+  footer{color:#7a7a7a;text-align:center;padding:28px 16px}
+
+  /* ============ 响应式 ============ */
+  @media (max-width:900px){ .grid{grid-template-columns:1fr 1fr} .h1{font-size:44px}}
+  @media (max-width:640px){ .grid{grid-template-columns:1fr} .h1{font-size:36px}}
 </style>
 </head>
 <body>
-<div class="wrap">
+  <!-- 加载动画 -->
+  <div class="loader" id="loader"><h1>零镜</h1></div>
 
-  <nav class="nav" aria-label="主导航">
-    <div class="brand">零镜</div>
-    <div style="display:flex;gap:18px">
-      <a href="#video" aria-label="短视频">视频</a>
-      <a href="#manifesto" aria-label="宣言">宣言</a>
-      <a href="#join" aria-label="加入">加入</a>
-    </div>
+  <!-- 背景层 -->
+  <canvas id="stars"></canvas>
+  <div class="aurora"></div>
+  <div class="cursor" id="cursor"></div>
+
+  <!-- 顶部导航（可删） -->
+  <nav>
+    <a href="/chapters.html">哲学体系</a>
+    <a href="/about.html">关于</a>
   </nav>
 
-  <main class="stage">
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="mirror" id="mirror" aria-hidden="true">
-        <div class="glow"></div>
+  <!-- 首屏：黑镜觉醒 -->
+  <main class="wrap">
+    <section class="mirror" id="mirror" aria-labelledby="t">
+      <div class="glow"></div>
+      <div class="silhouette"></div>
 
-        <!-- 标题与副句（只有一句话） -->
-        <div class="title">
-          <h1 id="hero-title" class="h1">零镜</h1>
-          <p class="sub">照见系统之前的你</p>
+      <div class="title">
+        <div>
+          <h1 id="t" class="h1">零镜</h1>
+          <div class="h1 h1-reflect" aria-hidden="true">零镜</div>
         </div>
+        <p id="subtitle" class="sub">照见系统之前的你</p>
+      </div>
 
-        <!-- 幽灵 CTA（想改为“开始观察”，改下面按钮文本即可） -->
-        <a class="cta" id="cta" href="#start">开始观察</a> <!-- ← 改成“开始观察” -->
+      <a class="cta" id="cta" href="/chapters.html">开始观察</a>
 
-        <!-- 裂纹（抽象放射状） -->
-        <svg class="cracks" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M50,38 L50,7" />
-          <path d="M50,38 L73,12" />
-          <path d="M50,38 L89,26" />
-          <path d="M50,38 L94,52" />
-          <path d="M50,38 L86,78" />
-          <path d="M50,38 L62,94" />
-          <path d="M50,38 L38,94" />
-          <path d="M50,38 L14,82" />
-          <path d="M50,38 L6,54" />
-          <path d="M50,38 L8,26" />
-          <path d="M50,38 L28,10" />
-        </svg>
+      <svg class="cracks" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M50,38 L50,7" />
+        <path d="M50,38 L73,12" />
+        <path d="M50,38 L89,26" />
+        <path d="M50,38 L94,52" />
+        <path d="M50,38 L86,78" />
+        <path d="M50,38 L62,94" />
+        <path d="M50,38 L38,94" />
+        <path d="M50,38 L14,82" />
+        <path d="M50,38 L6,54" />
+        <path d="M50,38 L8,26" />
+        <path d="M50,38 L28,10" />
+      </svg>
+    </section>
 
-        <!-- 碎裂/重组遮罩与两条路径 -->
-        <div class="blackout"></div>
-        <div class="overlay" id="overlay" aria-hidden="true">
-          <a href="#video">看 60 秒</a>
-          <a href="#manifesto">读宣言</a>
-        </div>
+    <!-- 二屏：低调 3D 视差玻璃卡（不要 Web2 味，文案极简） -->
+    <section class="grid" aria-label="精选">
+      <div class="card" data-tilt>
+        <span class="tag">知识主权</span>
+        <h3>从输入到自有语法</h3>
+        <p class="muted">让系统语言为你服务，而非同化你。</p>
+      </div>
+      <div class="card" data-tilt>
+        <span class="tag">决策主权</span>
+        <h3>看见被设定的选择</h3>
+        <p class="muted">拆掉框架，再做选择。</p>
+      </div>
+      <div class="card" data-tilt>
+        <span class="tag">资产主权</span>
+        <h3>把时间变成作品</h3>
+        <p class="muted">从打工逻辑转为作品逻辑。</p>
       </div>
     </section>
   </main>
 
-  <footer style="text-align:center;color:var(--muted);padding:28px 16px">
-    © 2025 零镜 · 系统对抗系统
-  </footer>
-</div>
+  <footer>© 2025 零镜 · 系统对抗系统</footer>
 
 <script>
+/* ===== 加载动画收起 ===== */
+window.addEventListener('load', ()=> setTimeout(()=> document.getElementById('loader').classList.add('hidden'), 900));
+
+/* ===== 星空：200 颗，低速漂移 ===== */
+(function(){
+  const c = document.getElementById('stars'); const x = c.getContext('2d');
+  function resize(){ c.width = innerWidth; c.height = innerHeight }
+  resize(); addEventListener('resize', resize);
+  const N = 200, stars = [];
+  for(let i=0;i<N;i++){
+    stars.push({x:Math.random()*c.width, y:Math.random()*c.height, r:Math.random()*1.6+0.2,
+                vx:(Math.random()-.5)*0.25, vy:(Math.random()-.5)*0.25, b:.3+Math.random()*0.7});
+  }
+  function tick(){
+    x.clearRect(0,0,c.width,c.height);
+    for(const s of stars){
+      s.x+=s.vx; s.y+=s.vy;
+      if(s.x<0) s.x+=c.width; if(s.x>c.width) s.x-=c.width;
+      if(s.y<0) s.y+=c.height; if(s.y>c.height) s.y-=c.height;
+      s.b += (Math.random()-.5)*0.06; if(s.b<.25) s.b=.25; if(s.b>1) s.b=1;
+      x.beginPath(); x.arc(s.x,s.y,s.r,0,Math.PI*2); x.fillStyle=`rgba(255,255,255,${s.b})`; x.fill();
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+/* ===== 鼠标光晕 & 裂纹开合 ===== */
 (function(){
   const root = document.documentElement;
   const mirror = document.getElementById('mirror');
-  const overlay = document.getElementById('overlay');
+  const cursor = document.getElementById('cursor');
 
-  // 鼠标靠近中心 → 裂纹开合、微光增强
-  mirror.addEventListener('mousemove', (e)=>{
-    const rect = mirror.getBoundingClientRect();
-    const cx = rect.left + rect.width*0.5;
-    const cy = rect.top + rect.height*0.40; // 裂纹原点略偏上
-    const dx = (e.clientX - cx);
-    const dy = (e.clientY - cy);
-    const dist = Math.hypot(dx, dy);
-    const max = Math.hypot(rect.width/2, rect.height/2);
-    const openness = Math.max(0, Math.min(1, 1 - dist/max)); // 越靠近越开
-    root.style.setProperty('--crack-open', (openness*1).toFixed(3));
+  document.addEventListener('mousemove',(e)=>{
+    cursor.style.left = (e.clientX-180)+'px';
+    cursor.style.top  = (e.clientY-180)+'px';
+    cursor.style.opacity = 1;
   });
+  document.addEventListener('mouseleave',()=> cursor.style.opacity = 0);
 
-  mirror.addEventListener('mouseleave', ()=>{
-    root.style.setProperty('--crack-open', 0);
+  mirror.addEventListener('mousemove',(e)=>{
+    const r = mirror.getBoundingClientRect();
+    const cx = r.left + r.width*0.5, cy = r.top + r.height*0.40;  // 原点略偏上
+    const dx = e.clientX - cx, dy = e.clientY - cy;
+    const dist = Math.hypot(dx,dy), max = Math.hypot(r.width/2, r.height/2);
+    const open = Math.max(0, Math.min(1, 1 - dist/max));          // 越近越大
+    root.style.setProperty('--open', open.toFixed(3));
   });
-
-  // 点击镜面：碎裂→黑→重组→出现两条路径
-  let busy = false;
-  mirror.addEventListener('click', ()=>{
-    if(busy) return;
-    busy = true;
-    mirror.classList.add('shatter');
-    setTimeout(()=>{ // 黑场
-      mirror.classList.add('reform');
-      overlay.setAttribute('aria-hidden','false');
-      setTimeout(()=>{
-        mirror.classList.remove('shatter'); // 重置为“重组完成”的状态
-        busy = false;
-      }, 900);
-    }, 600);
-  });
-
-  // 想把暗金微光改为“更可见（+16%）”：把下一行的 0.10 改成 0.16 或直接改 CSS 变量
-  // document.documentElement.style.setProperty('--gold-alpha','0.16');
+  mirror.addEventListener('mouseleave',()=> root.style.setProperty('--open', 0));
 })();
+
+/* ===== CTA 涟漪（液态按钮） ===== */
+document.getElementById('cta').addEventListener('click', function(e){
+  const r = this.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  ripple.style.left = (e.clientX - r.left) + 'px';
+  ripple.style.top  = (e.clientY - r.top)  + 'px';
+  this.appendChild(ripple);
+  setTimeout(()=> ripple.remove(), 900);
+});
+
+/* ===== 打字机效果（副标题逐字显示） ===== */
+(function(){
+  const el = document.getElementById('subtitle');
+  const txt = el.textContent.trim(); el.textContent = ''; el.style.opacity = .85;
+  let i = 0; const step = ()=>{ if(i<=txt.length){ el.textContent = txt.slice(0,i++); setTimeout(step, 60); } };
+  setTimeout(step, 600);
+})();
+
+/* ===== 3D 视差效果（卡片悬停） ===== */
+document.querySelectorAll('[data-tilt]').forEach(card=>{
+  card.addEventListener('mousemove', (e)=>{
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    const rx = (y - r.height/2) / 18, ry = (r.width/2 - x) / 18;
+    card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(8px)`;
+  });
+  card.addEventListener('mouseleave', ()=> card.style.transform = 'perspective(900px) rotateX(0) rotateY(0) translateZ(0)');
+});
 </script>
 </body>
 </html>
