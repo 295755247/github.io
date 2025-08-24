@@ -16,9 +16,13 @@
       --accent2:#6366F1;
       --accent-weak:rgba(34,211,238,.12);
 
-      /* 新增：统一“去寻找”与两行副文案的字号 */
-      --hero-font-size-desktop: 24px;  /* 桌面端统一字号 */
-      --hero-font-size-mobile: 18px;   /* 移动端统一字号 */
+      /* 统一 hero 文案字号（两行同号） */
+      --hero-font-size-desktop: 24px;
+      --hero-font-size-mobile: 18px;
+
+      /* 新增：Kicker“去寻找”的小号字号 */
+      --kicker-size-desktop: 12px;
+      --kicker-size-mobile: 12px;
     }
 
     *{margin:0;padding:0;box-sizing:border-box}
@@ -66,7 +70,7 @@
     nav a:hover{color:#fff}
 
     /* Logo区 */
-    .logo-section{text-align:center;margin-bottom:80px;animation:fadeInUp 1.5s ease}
+    .logo-section{text-align:center;margin-bottom:64px;animation:fadeInUp 1.5s ease}
     @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 
     .main-logo{
@@ -83,120 +87,63 @@
       background:linear-gradient(to bottom,#999,transparent);-webkit-background-clip:text;-webkit-text-fill-color:transparent
     }
 
-    /* 核心文字区域 - 方案三：对话式 */
+    /* 核心文字区域 */
     .philosophy-statement {
       text-align: center;
-      margin: 0 auto 100px;
+      margin: 0 auto 80px;
       max-width: 800px;
       animation: fadeIn 2s ease 0.8s both;
     }
 
-    /* 去寻找 - 带横线装饰 */
+    /* 去寻找 = 小号胶囊式 Kicker（非标题） */
     .statement-primary {
       position: relative;
-      margin-bottom: 40px;
-      animation: fadeInScale 2s ease 1s both;
+      margin-bottom: 8px;              /* 压缩留白 */
+      animation: fadeInScale 1.2s ease 1s both;
     }
-
     .statement-primary span {
-      /* 统一为变量（仅改大小） */
-      font-size: var(--hero-font-size-desktop); /* 原来 48px */
-      font-weight: 100;
-      letter-spacing: 12px;
-      color: #ffffff;
+      font-size: var(--kicker-size-desktop); /* 小号 */
+      font-weight: 500;
+      letter-spacing: 0.12em;               /* 收紧 */
+      color: #cfeaf1;
       display: inline-block;
-      padding: 0 40px;
-      position: relative;
-      text-shadow: 0 0 30px rgba(255,255,255,0.3);
+      padding: 4px 10px;                    /* 胶囊 */
+      border: 1px solid rgba(148,242,255,.35);
+      border-radius: 999px;
+      background: rgba(34,211,238,.06);
+      text-shadow: none;
     }
-
-    /* 横线装饰 */
+    /* 取消原左右装饰线 */
     .statement-primary::before,
-    .statement-primary::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: 120px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      animation: expandLine 2s ease 1.3s both;
-    }
+    .statement-primary::after { display:none; }
 
-    .statement-primary::before {
-      left: 50%;
-      transform: translateX(-100%) translateX(-160px);
-    }
-
-    .statement-primary::after {
-      right: 50%;
-      transform: translateX(100%) translateX(160px);
-    }
-
-    @keyframes expandLine {
-      from { width: 0; opacity: 0; }
-      to { width: 120px; opacity: 1; }
-    }
-
-    /* 箭头指示 */
+    /* 箭头更紧凑 */
     .statement-arrow {
-      font-size: 24px;
-      color: rgba(255,255,255,0.3);
-      margin: 20px 0;
+      font-size: 16px;
+      color: rgba(255,255,255,0.35);
+      margin: 8px 0 12px;               /* 更短 */
       animation: floatDown 2s ease-in-out infinite;
     }
-
     @keyframes floatDown {
       0%, 100% { transform: translateY(0); opacity: 0.3; }
-      50% { transform: translateY(5px); opacity: 0.6; }
+      50% { transform: translateY(4px); opacity: 0.6; }
     }
 
-    /* 无论任何时候，你都有选择 */
-    .statement-secondary {
-      animation: fadeInUp2 2s ease 1.5s both;
-    }
-
+    /* 两行主文案（保持同字号） */
+    .statement-secondary { animation: fadeInUp2 1.4s ease 1.2s both; }
     .statement-line1,
     .statement-line2 {
-      /* 两行统一为同一个字号（仅改大小） */
-      font-size: var(--hero-font-size-desktop); /* 原来 36px */
+      font-size: var(--hero-font-size-desktop);
       font-weight: 200;
       line-height: 1.6;
       letter-spacing: 4px;
       color: #e0e0e0;
     }
+    .statement-line1 { margin-bottom: 5px; opacity: 0.9; }
+    .statement-line2 { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
 
-    .statement-line1 {
-      margin-bottom: 5px;
-      opacity: 0.9;
-    }
-
-    .statement-line2 {
-      opacity: 1;
-      text-shadow: 0 0 20px rgba(255,255,255,0.2);
-    }
-
-    @keyframes fadeInScale {
-      from { 
-        opacity: 0; 
-        transform: scale(0.9);
-      }
-      to { 
-        opacity: 1; 
-        transform: scale(1);
-      }
-    }
-
-    @keyframes fadeInUp2 {
-      from { 
-        opacity: 0; 
-        transform: translateY(20px);
-      }
-      to { 
-        opacity: 1; 
-        transform: translateY(0);
-      }
-    }
-
+    @keyframes fadeInScale { from {opacity:0; transform:scale(.96);} to {opacity:1; transform:scale(1);} }
+    @keyframes fadeInUp2 { from {opacity:0; transform:translateY(14px);} to {opacity:1; transform:translateY(0);} }
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
     /* 玻璃态卡片 */
@@ -244,13 +191,11 @@
     @media (max-width:768px){
       .main-logo,.logo-reflection{font-size:60px;letter-spacing:15px;margin-right:-15px}
 
-      /* 移动端同样统一字号（仅改大小） */
-      .statement-primary span{font-size:var(--hero-font-size-mobile);}   /* 原来 36px */
-      .statement-line1,.statement-line2{font-size:var(--hero-font-size-mobile);} /* 原来 24px */
+      /* Kicker 与两行文案的移动端尺寸 */
+      .statement-primary span{font-size:var(--kicker-size-mobile);}
+      .statement-arrow{font-size:14px;margin:6px 0 10px;}
+      .statement-line1,.statement-line2{font-size:var(--hero-font-size-mobile);}
 
-      .statement-primary::before,.statement-primary::after{width:60px}
-      .statement-primary::before{transform:translateX(-100%) translateX(-100px)}
-      .statement-primary::after{transform:translateX(100%) translateX(100px)}
       .philosophy-cards{grid-template-columns:1fr;padding:0 20px}
       nav{top:20px;right:20px}
       nav a{display:block;margin:10px 0;text-align:right}
@@ -280,12 +225,14 @@
       <div class="logo-reflection">零镜</div>
     </div>
 
-    <!-- 核心哲学宣言 - 对话式 -->
+    <!-- 核心哲学宣言 -->
     <div class="philosophy-statement">
+      <!-- “去寻找”已降级为小号 Kicker（非标题） -->
       <div class="statement-primary">
         <span>去寻找</span>
       </div>
       <div class="statement-arrow">↓</div>
+
       <div class="statement-secondary">
         <div class="statement-line1">无论任何时候</div>
         <div class="statement-line2">你都有选择</div>
@@ -336,12 +283,8 @@
 
     /* 星空（200颗） */
     const canvas=document.getElementById('stars-canvas'),ctx=canvas.getContext('2d');
-    function resize(){ 
-      canvas.width=innerWidth; 
-      canvas.height=innerHeight 
-    } 
-    resize();
-    addEventListener('resize',resize);
+    function resize(){ canvas.width=innerWidth; canvas.height=innerHeight } 
+    resize(); addEventListener('resize',resize);
 
     class Star{
       constructor(){ 
@@ -353,12 +296,9 @@
         this.brightness=Math.random(); 
       }
       update(){
-        this.x+=this.speedX; 
-        this.y+=this.speedY;
-        if(this.x<0) this.x=canvas.width; 
-        if(this.x>canvas.width) this.x=0;
-        if(this.y<0) this.y=canvas.height; 
-        if(this.y>canvas.height) this.y=0;
+        this.x+=this.speedX; this.y+=this.speedY;
+        if(this.x<0) this.x=canvas.width; if(this.x>canvas.width) this.x=0;
+        if(this.y<0) this.y=canvas.height; if(this.y>canvas.height) this.y=0;
         this.brightness += (Math.random()-.5)*0.1; 
         if(this.brightness<.3) this.brightness=.3; 
         if(this.brightness>1) this.brightness=1;
@@ -370,10 +310,7 @@
         ctx.fill(); 
       }
     }
-    
-    const stars=[]; 
-    for(let i=0;i<200;i++) stars.push(new Star());
-    
+    const stars=[]; for(let i=0;i<200;i++) stars.push(new Star());
     (function animate(){ 
       ctx.clearRect(0,0,canvas.width,canvas.height); 
       stars.forEach(s=>{s.update();s.draw()}); 
@@ -383,11 +320,7 @@
     /* 鼠标光晕 */
     const cursorGlow=document.getElementById('cursorGlow');
     let mouseX=0,mouseY=0,currentX=0,currentY=0;
-    document.addEventListener('mousemove',e=>{
-      mouseX=e.clientX;
-      mouseY=e.clientY;
-    });
-    
+    document.addEventListener('mousemove',e=>{ mouseX=e.clientX; mouseY=e.clientY; });
     function updateCursor(){ 
       currentX+=(mouseX-currentX)*0.1; 
       currentY+=(mouseY-currentY)*0.1;
@@ -400,11 +333,8 @@
     /* 卡片3D视差 */
     document.querySelectorAll('.card').forEach(card=>{
       card.addEventListener('mousemove',e=>{
-        const r=card.getBoundingClientRect(), 
-              x=e.clientX-r.left, 
-              y=e.clientY-r.top;
-        const rx=(y-r.height/2)/10, 
-              ry=(r.width/2-x)/10;
+        const r=card.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
+        const rx=(y-r.height/2)/10, ry=(r.width/2-x)/10;
         card.style.transform=`perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(10px)`;
       });
       card.addEventListener('mouseleave',()=> {
@@ -421,10 +351,7 @@
       s.style.left=(e.clientX-r.left)+'px'; 
       s.style.top=(e.clientY-r.top)+'px';
       this.appendChild(s); 
-      setTimeout(()=>{
-        s.remove();
-        window.location.href = this.href;
-      },650);
+      setTimeout(()=>{ s.remove(); window.location.href=this.href; },650);
     });
   </script>
 </body>
