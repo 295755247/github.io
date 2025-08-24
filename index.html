@@ -12,9 +12,8 @@
       --muted:#9aa0a6;
       --glass:rgba(255,255,255,0.03);
       --glass-border:rgba(255,255,255,0.10);
-      /* 未来理性黑：青蓝 + 靛紫 */
-      --accent:#22D3EE;   /* 青蓝 Cyan */
-      --accent2:#6366F1;  /* 靛紫 Indigo */
+      --accent:#22D3EE;
+      --accent2:#6366F1;
       --accent-weak:rgba(34,211,238,.12);
     }
 
@@ -63,7 +62,7 @@
     nav a:hover{color:#fff}
 
     /* Logo区 */
-    .logo-section{text-align:center;margin-bottom:50px;animation:fadeInUp 1.5s ease}
+    .logo-section{text-align:center;margin-bottom:80px;animation:fadeInUp 1.5s ease}
     @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 
     .main-logo{
@@ -80,38 +79,116 @@
       background:linear-gradient(to bottom,#999,transparent);-webkit-background-clip:text;-webkit-text-fill-color:transparent
     }
 
-    /* 主文字区域 */
-    .philosophy-text {
+    /* 核心文字区域 - 方案三：对话式 */
+    .philosophy-statement {
       text-align: center;
-      margin: 40px 0 60px 0;
+      margin: 0 auto 100px;
+      max-width: 800px;
       animation: fadeIn 2s ease 0.8s both;
     }
 
-    .text-line1 {
-      font-size: 28px;
+    /* 去寻找 - 带横线装饰 */
+    .statement-primary {
+      position: relative;
+      margin-bottom: 40px;
+      animation: fadeInScale 2s ease 1s both;
+    }
+
+    .statement-primary span {
+      font-size: 48px;
+      font-weight: 100;
+      letter-spacing: 12px;
+      color: #ffffff;
+      display: inline-block;
+      padding: 0 40px;
+      position: relative;
+      text-shadow: 0 0 30px rgba(255,255,255,0.3);
+    }
+
+    /* 横线装饰 */
+    .statement-primary::before,
+    .statement-primary::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 120px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: expandLine 2s ease 1.3s both;
+    }
+
+    .statement-primary::before {
+      left: 50%;
+      transform: translateX(-100%) translateX(-160px);
+    }
+
+    .statement-primary::after {
+      right: 50%;
+      transform: translateX(100%) translateX(160px);
+    }
+
+    @keyframes expandLine {
+      from { width: 0; opacity: 0; }
+      to { width: 120px; opacity: 1; }
+    }
+
+    /* 箭头指示 */
+    .statement-arrow {
+      font-size: 24px;
+      color: rgba(255,255,255,0.3);
+      margin: 20px 0;
+      animation: floatDown 2s ease-in-out infinite;
+    }
+
+    @keyframes floatDown {
+      0%, 100% { transform: translateY(0); opacity: 0.3; }
+      50% { transform: translateY(5px); opacity: 0.6; }
+    }
+
+    /* 无论任何时候，你都有选择 */
+    .statement-secondary {
+      animation: fadeInUp2 2s ease 1.5s both;
+    }
+
+    .statement-line1,
+    .statement-line2 {
+      font-size: 36px;
       font-weight: 200;
-      letter-spacing: 6px;
+      line-height: 1.6;
+      letter-spacing: 4px;
       color: #e0e0e0;
-      margin-bottom: 15px;
-      animation: pulseText 3s ease-in-out infinite;
     }
 
-    .text-line2 {
-      font-size: 20px;
-      font-weight: 200;
-      letter-spacing: 3px;
-      color: #9aa0a6;
-      animation: fadeInUp2 2s ease 1.2s both;
+    .statement-line1 {
+      margin-bottom: 5px;
+      opacity: 0.9;
     }
 
-    @keyframes pulseText {
-      0%, 100% { opacity: 0.85; }
-      50% { opacity: 1; }
+    .statement-line2 {
+      opacity: 1;
+      text-shadow: 0 0 20px rgba(255,255,255,0.2);
+    }
+
+    @keyframes fadeInScale {
+      from { 
+        opacity: 0; 
+        transform: scale(0.9);
+      }
+      to { 
+        opacity: 1; 
+        transform: scale(1);
+      }
     }
 
     @keyframes fadeInUp2 {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { 
+        opacity: 0; 
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0);
+      }
     }
 
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -119,7 +196,7 @@
     /* 玻璃态卡片 */
     .philosophy-cards{
       display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-      gap:30px;max-width:1000px;width:100%;margin-bottom:60px;animation:fadeIn 2s ease 1.5s both
+      gap:30px;max-width:1000px;width:100%;margin-bottom:60px;animation:fadeIn 2s ease 2s both
     }
     .card{
       background:var(--glass);backdrop-filter:blur(20px);
@@ -138,7 +215,7 @@
     .card-highlight{color:#93e5f9;font-weight:500}
 
     /* CTA按钮 */
-    .cta-section{animation:fadeIn 2s ease 2s both}
+    .cta-section{animation:fadeIn 2s ease 2.5s both}
     .cta-button{
       display:inline-block;padding:16px 44px;font-size:16px;letter-spacing:3px;
       color:#c8f7ff;background:rgba(34,211,238,.08);
@@ -155,13 +232,16 @@
     @keyframes ripple{to{width:300px;height:300px;opacity:0}}
 
     /* 底部 */
-    footer{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:#666;font-size:14px;z-index:10;animation:fadeIn 2s ease 2.5s both}
+    footer{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:#666;font-size:14px;z-index:10;animation:fadeIn 2s ease 3s both}
 
     /* 响应式 */
     @media (max-width:768px){
       .main-logo,.logo-reflection{font-size:60px;letter-spacing:15px;margin-right:-15px}
-      .text-line1{font-size:22px;letter-spacing:4px}
-      .text-line2{font-size:16px;letter-spacing:2px}
+      .statement-primary span{font-size:36px;letter-spacing:8px}
+      .statement-line1,.statement-line2{font-size:24px;letter-spacing:2px}
+      .statement-primary::before,.statement-primary::after{width:60px}
+      .statement-primary::before{transform:translateX(-100%) translateX(-100px)}
+      .statement-primary::after{transform:translateX(100%) translateX(100px)}
       .philosophy-cards{grid-template-columns:1fr;padding:0 20px}
       nav{top:20px;right:20px}
       nav a{display:block;margin:10px 0;text-align:right}
@@ -191,10 +271,16 @@
       <div class="logo-reflection">零镜</div>
     </div>
 
-    <!-- 哲学文字 -->
-    <div class="philosophy-text">
-      <div class="text-line1">去寻找</div>
-      <div class="text-line2">无论任何时候，你都有选择</div>
+    <!-- 核心哲学宣言 - 对话式 -->
+    <div class="philosophy-statement">
+      <div class="statement-primary">
+        <span>去寻找</span>
+      </div>
+      <div class="statement-arrow">↓</div>
+      <div class="statement-secondary">
+        <div class="statement-line1">无论任何时候</div>
+        <div class="statement-line2">你都有选择</div>
+      </div>
     </div>
 
     <!-- 三张卡片 -->
