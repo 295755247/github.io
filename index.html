@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>零镜| 照见系统，归零重构</title>
+  <title>零镜 - ZeroJing | 照见系统，归零重构</title>
   <meta name="description" content="零镜 - 去寻找，无论任何时候，你都有选择" />
   <style>
     :root{
@@ -15,6 +15,10 @@
       --accent:#22D3EE;
       --accent2:#6366F1;
       --accent-weak:rgba(34,211,238,.12);
+
+      /* 新增：统一“去寻找”与两行副文案的字号 */
+      --hero-font-size-desktop: 24px;  /* 桌面端统一字号 */
+      --hero-font-size-mobile: 18px;   /* 移动端统一字号 */
     }
 
     *{margin:0;padding:0;box-sizing:border-box}
@@ -95,7 +99,8 @@
     }
 
     .statement-primary span {
-      font-size: 48px;
+      /* 统一为变量（仅改大小） */
+      font-size: var(--hero-font-size-desktop); /* 原来 48px */
       font-weight: 100;
       letter-spacing: 12px;
       color: #ffffff;
@@ -152,7 +157,8 @@
 
     .statement-line1,
     .statement-line2 {
-      font-size: 36px;
+      /* 两行统一为同一个字号（仅改大小） */
+      font-size: var(--hero-font-size-desktop); /* 原来 36px */
       font-weight: 200;
       line-height: 1.6;
       letter-spacing: 4px;
@@ -237,8 +243,11 @@
     /* 响应式 */
     @media (max-width:768px){
       .main-logo,.logo-reflection{font-size:60px;letter-spacing:15px;margin-right:-15px}
-      .statement-primary span{font-size:36px;letter-spacing:8px}
-      .statement-line1,.statement-line2{font-size:24px;letter-spacing:2px}
+
+      /* 移动端同样统一字号（仅改大小） */
+      .statement-primary span{font-size:var(--hero-font-size-mobile);}   /* 原来 36px */
+      .statement-line1,.statement-line2{font-size:var(--hero-font-size-mobile);} /* 原来 24px */
+
       .statement-primary::before,.statement-primary::after{width:60px}
       .statement-primary::before{transform:translateX(-100%) translateX(-100px)}
       .statement-primary::after{transform:translateX(100%) translateX(100px)}
@@ -317,7 +326,7 @@
   </div>
 
   <!-- 底部 -->
-  <footer>© 2025 零镜 . All rights reserved.</footer>
+  <footer>© 2024 零镜 Zerojing. All rights reserved.</footer>
 
   <script>
     /* 加载动画 */
