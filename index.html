@@ -91,7 +91,7 @@
       animation: fadeIn 2s ease 0.8s both;
     }
 
-    /* 三行主文案（含“去寻找”） */
+    /* 三行主文案（含"去寻找"） */
     .statement-secondary { animation: fadeInUp2 1.4s ease 1.0s both; }
     .statement-line1,
     .statement-line2 {
@@ -148,27 +148,40 @@
     /* 底部 */
     footer{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:#666;font-size:14px;z-index:10;animation:fadeIn 2s ease 3s both}
 
-    /* 响应式 */
+    /* 响应式 - 手机端卡片内容居中 */
     @media (max-width:768px){
       .main-logo,.logo-reflection{font-size:60px;letter-spacing:15px;margin-right:-15px}
       .statement-line1,.statement-line2{font-size:var(--hero-font-size-mobile);}
       .philosophy-cards{grid-template-columns:1fr;padding:0 20px}
+      
+      /* 手机端卡片内容居中 */
+      .card {
+        text-align: center;
+      }
+      .card-title {
+        text-align: center;
+      }
+      .card-content {
+        text-align: center;
+      }
+      
       nav{top:20px;right:20px}
       nav a{display:block;margin:10px 0;text-align:right}
     }
-    /* 让“去寻找 / 无论任何时候 / 你都有选择”这块更靠上 */
-.logo-section{               /* 缩短 logo 与文案的间距 */
-  margin-bottom: 28px;       /* 原来 64px */
-}
-.philosophy-statement{       /* 自身再向上挪一点，并压缩与卡片的间距 */
-  margin-top: -12px;          /* 向上提 8px */
-  margin-bottom: 48px;       /* 原来 80px */
-}
+    
+    /* 让"去寻找 / 无论任何时候 / 你都有选择"这块更靠上 */
+    .logo-section{               /* 缩短 logo 与文案的间距 */
+      margin-bottom: 28px;       /* 原来 64px */
+    }
+    .philosophy-statement{       /* 自身再向上挪一点，并压缩与卡片的间距 */
+      margin-top: -12px;          /* 向上提 8px */
+      margin-bottom: 48px;       /* 原来 80px */
+    }
 
-@media (max-width:768px){    /* 移动端也同步上移一些 */
-  .logo-section{ margin-bottom: 36px; }
-  .philosophy-statement{ margin-top: -6px; margin-bottom: 44px; }
-}
+    @media (max-width:768px){    /* 移动端也同步上移一些 */
+      .logo-section{ margin-bottom: 36px; }
+      .philosophy-statement{ margin-top: -6px; margin-bottom: 44px; }
+    }
   </style>
 </head>
 <body>
@@ -194,7 +207,7 @@
       <div class="logo-reflection">零镜</div>
     </div>
 
-    <!-- 核心哲学宣言（“去寻找”并入相同样式） -->
+    <!-- 核心哲学宣言（"去寻找"并入相同样式） -->
     <div class="philosophy-statement">
       <div class="statement-secondary">
         <div class="statement-line1">去寻找</div>
