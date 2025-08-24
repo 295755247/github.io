@@ -16,13 +16,9 @@
       --accent2:#6366F1;
       --accent-weak:rgba(34,211,238,.12);
 
-      /* 统一 hero 文案字号（两行同号） */
+      /* 统一 hero 文案字号（三行同号） */
       --hero-font-size-desktop: 24px;
       --hero-font-size-mobile: 18px;
-
-      /* 新增：Kicker“去寻找”的小号字号 */
-      --kicker-size-desktop: 12px;
-      --kicker-size-mobile: 12px;
     }
 
     *{margin:0;padding:0;box-sizing:border-box}
@@ -95,42 +91,8 @@
       animation: fadeIn 2s ease 0.8s both;
     }
 
-    /* 去寻找 = 小号胶囊式 Kicker（非标题） */
-    .statement-primary {
-      position: relative;
-      margin-bottom: 8px;              /* 压缩留白 */
-      animation: fadeInScale 1.2s ease 1s both;
-    }
-    .statement-primary span {
-      font-size: var(--kicker-size-desktop); /* 小号 */
-      font-weight: 500;
-      letter-spacing: 0.12em;               /* 收紧 */
-      color: #cfeaf1;
-      display: inline-block;
-      padding: 4px 10px;                    /* 胶囊 */
-      border: 1px solid rgba(148,242,255,.35);
-      border-radius: 999px;
-      background: rgba(34,211,238,.06);
-      text-shadow: none;
-    }
-    /* 取消原左右装饰线 */
-    .statement-primary::before,
-    .statement-primary::after { display:none; }
-
-    /* 箭头更紧凑 */
-    .statement-arrow {
-      font-size: 16px;
-      color: rgba(255,255,255,0.35);
-      margin: 8px 0 12px;               /* 更短 */
-      animation: floatDown 2s ease-in-out infinite;
-    }
-    @keyframes floatDown {
-      0%, 100% { transform: translateY(0); opacity: 0.3; }
-      50% { transform: translateY(4px); opacity: 0.6; }
-    }
-
-    /* 两行主文案（保持同字号） */
-    .statement-secondary { animation: fadeInUp2 1.4s ease 1.2s both; }
+    /* 三行主文案（含“去寻找”） */
+    .statement-secondary { animation: fadeInUp2 1.4s ease 1.0s both; }
     .statement-line1,
     .statement-line2 {
       font-size: var(--hero-font-size-desktop);
@@ -142,7 +104,6 @@
     .statement-line1 { margin-bottom: 5px; opacity: 0.9; }
     .statement-line2 { opacity: 1; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
 
-    @keyframes fadeInScale { from {opacity:0; transform:scale(.96);} to {opacity:1; transform:scale(1);} }
     @keyframes fadeInUp2 { from {opacity:0; transform:translateY(14px);} to {opacity:1; transform:translateY(0);} }
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
@@ -190,12 +151,7 @@
     /* 响应式 */
     @media (max-width:768px){
       .main-logo,.logo-reflection{font-size:60px;letter-spacing:15px;margin-right:-15px}
-
-      /* Kicker 与两行文案的移动端尺寸 */
-      .statement-primary span{font-size:var(--kicker-size-mobile);}
-      .statement-arrow{font-size:14px;margin:6px 0 10px;}
       .statement-line1,.statement-line2{font-size:var(--hero-font-size-mobile);}
-
       .philosophy-cards{grid-template-columns:1fr;padding:0 20px}
       nav{top:20px;right:20px}
       nav a{display:block;margin:10px 0;text-align:right}
@@ -225,15 +181,10 @@
       <div class="logo-reflection">零镜</div>
     </div>
 
-    <!-- 核心哲学宣言 -->
+    <!-- 核心哲学宣言（“去寻找”并入相同样式） -->
     <div class="philosophy-statement">
-      <!-- “去寻找”已降级为小号 Kicker（非标题） -->
-      <div class="statement-primary">
-        <span>去寻找</span>
-      </div>
-      <div class="statement-arrow">↓</div>
-
       <div class="statement-secondary">
+        <div class="statement-line1">去寻找</div>
         <div class="statement-line1">无论任何时候</div>
         <div class="statement-line2">你都有选择</div>
       </div>
