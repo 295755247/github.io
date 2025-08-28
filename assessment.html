@@ -233,3 +233,60 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>提交表单 | 零镜</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: #fff;
+      text-align: center;
+      padding: 50px;
+    }
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 10px;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+    }
+    input, textarea {
+      background: #1a1a1a;
+      color: #fff;
+    }
+    button {
+      background: #00bcd4;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0097a7;
+    }
+  </style>
+</head>
+<body>
+  <h1>提交你的问题 / 留言</h1>
+  <form action="https://formspree.io/f/mandnyel" method="POST">
+    <label>
+      你的邮箱：
+      <input type="email" name="email" required>
+    </label>
+    <label>
+      你的消息：
+      <textarea name="message" rows="5" required></textarea>
+    </label>
+    <button type="submit">发送</button>
+  </form>
+</body>
+</html>
